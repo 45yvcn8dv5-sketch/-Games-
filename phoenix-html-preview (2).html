@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHILL-HUB - Ultimate Interactive Experience</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-300 relative overflow-x-hidden" id="mainBody" style="background-size: cover; background-position: center;">
+
+    <!-- Background Overlay for Custom Backgrounds -->
+    <div id="bgOverlay" class="absolute inset-0 bg-slate-50/90 dark:bg-slate-950/90 pointer-events-none -z-10 transition-colors duration-300"></div>
+
+    <!-- Toast Notification Box -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-3 rounded-xl shadow-2xl font-medium flex items-center space-x-3">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toastMessage">Notification message</span>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-green-500 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-green-500/30">
+                    <i class="fa-solid fa-bolt text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-green-600 to-emerald-500 dark:from-green-400 dark:to-emerald-300 bg-clip-text text-transparent">CHILL-HUB</span>
+                    <span class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Interactive Space</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="hidden md:flex items-center space-x-1">
+                <button onclick="switchTab('home')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/50" data-tab="home">
+                    <i class="fa-solid fa-house mr-2"></i>Home
+                </button>
+                <button onclick="switchTab('library')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-tab="library">
+                    <i class="fa-solid fa-book-open mr-2"></i>Library
+                </button>
+                <button onclick="switchTab('games')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-tab="games">
+                    <i class="fa-solid fa-gamepad mr-2"></i>Arcade
+                </button>
+                <button onclick="switchTab('settings')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-tab="settings">
+                    <i class="fa-solid fa-gear mr-2"></i>Settings
+                </button>
+            </nav>
+
+            <!-- Quick Controls / Mobile Menu Toggle -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleAudio()" id="soundToggleBtn" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Toggle Sound Effects">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-800 px-4 pt-2 pb-4 space-y-1 glass-panel">
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium flex items-center space-x-3 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/50">
+                <i class="fa-solid fa-house w-5"></i><span>Home</span>
+            </button>
+            <button onclick="switchTab('library'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium flex items-center space-x-3 text-slate-600 dark:text-slate-400">
+                <i class="fa-solid fa-book-open w-5"></i><span>Library</span>
+            </button>
+            <button onclick="switchTab('games'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium flex items-center space-x-3 text-slate-600 dark:text-slate-400">
+                <i class="fa-solid fa-gamepad w-5"></i><span>Arcade</span>
+            </button>
+            <button onclick="switchTab('settings'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium flex items-center space-x-3 text-slate-600 dark:text-slate-400">
+                <i class="fa-solid fa-gear w-5"></i><span>Settings</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- HOME TAB (Carousel & Featured) -->
+        <div id="tab-home" class="space-y-8 tab-content">
+            <!-- Hero Banner / Carousel Section -->
+            <div class="relative rounded-3xl overflow-hidden glass-panel border border-slate-200 dark:border-slate-800 shadow-2xl">
+                <div id="carouselContainer" class="relative h-[400px] sm:h-[450px] flex items-center justify-center overflow-hidden">
+                    <!-- Carousel slides injected via JS -->
+                </div>
+                <!-- Carousel Controls -->
+                <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-900/50 hover:bg-slate-900 text-white flex items-center justify-center transition-all backdrop-blur-md">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-900/50 hover:bg-slate-900 text-white flex items-center justify-center transition-all backdrop-blur-md">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <!-- Indicators -->
+                <div id="carouselDots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2"></div>
+            </div>
+
+            <!-- Quick Access Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="switchTab('library')" class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-green-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-book-bookmark text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-1">Explore Library</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Discover curated articles, guides, and creative media resources.</p>
+                </div>
+                <div onclick="switchTab('games')" class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-green-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-gamepad text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-1">Play Arcade</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Jump right into fun interactive retro and casual mini-games.</p>
+                </div>
+                <div onclick="switchTab('settings')" class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-green-500/50 transition-all group">
+                    <div class="w-12 h-12 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-palette text-xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-1">Personalize</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Customize themes, custom background wallpapers, and sound preferences.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIBRARY TAB -->
+        <div id="tab-library" class="space-y-6 tab-content hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">CHILL-HUB Library</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Explore curated topics, articles, and useful references.</p>
+                </div>
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="librarySearch" oninput="filterLibrary()" placeholder="Search library..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:border-green-500 transition-colors">
+                </div>
+            </div>
+
+            <!-- Library Grid -->
+            <div id="libraryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+
+        <!-- GAMES / ARCADE TAB -->
+        <div id="tab-games" class="space-y-6 tab-content hidden">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold tracking-tight">CHILL-HUB Arcade</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Play instant browser games right inside your session.</p>
+                </div>
+            </div>
+
+            <!-- Game Launcher Selection Screen -->
+            <div id="gameSelector" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Game Card 1: Clicker Game -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between group hover:border-green-500/50 transition-all">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-cookie-bite text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1">Energy Clicker</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Tap to generate energy pulses, unlock upgrades, and score big!</p>
+                    </div>
+                    <button onclick="launchGame('clicker')" class="w-full py-2.5 px-4 rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium text-sm transition-colors shadow-lg shadow-green-500/20 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-play"></i><span>Play Game</span>
+                    </button>
+                </div>
+
+                <!-- Game Card 2: Memory Match -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between group hover:border-green-500/50 transition-all">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-brain text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-1">Memory Match</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Test your memory by matching pairs of icons in the shortest time.</p>
+                    </div>
+                    <button onclick="launchGame('memory')" class="w-full py-2.5 px-4 rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium text-sm transition-colors shadow-lg shadow-green-500/20 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-play"></i><span>Play Game</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Game Arena (Hidden by default) -->
+            <div id="gameArena" class="hidden glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800 relative">
+                <div class="flex items-center justify-between mb-6">
+                    <button onclick="closeGame()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-sm font-medium transition-colors flex items-center space-x-2">
+                        <i class="fa-solid fa-arrow-left"></i><span>Back to Arcade</span>
+                    </button>
+                    <h3 id="activeGameTitle" class="text-xl font-bold">Game Title</h3>
+                    <div class="w-24"></div>
+                </div>
+                <div id="gameContainer" class="flex flex-col items-center justify-center min-h-[350px]">
+                    <!-- Injected game canvas or markup -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="space-y-6 tab-content hidden max-w-3xl mx-auto">
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight">CHILL-HUB Settings</h2>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Customize your workspace experience, themes, and wallpapers.</p>
+            </div>
+
+            <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-6">
+                <!-- Wallpaper Settings -->
+                <div>
+                    <h3 class="text-base font-semibold mb-2">Custom Background Wallpaper</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Enter a direct image URL to set as your custom background wallpaper.</p>
+                    <div class="flex gap-3">
+                        <input type="url" id="bgInput" placeholder="https://example.com/image.jpg" class="flex-grow px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:border-green-500">
+                        <button onclick="applyBackground()" class="px-5 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white font-medium text-sm transition-colors shadow-lg shadow-green-500/20">Apply</button>
+                        <button onclick="clearBackground()" class="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-medium text-sm transition-colors">Reset</button>
+                    </div>
+                </div>
+
+                <hr class="border-slate-200 dark:border-slate-800">
+
+                <!-- Theme / Appearance -->
+                <div>
+                    <h3 class="text-base font-semibold mb-2">Appearance Mode</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Switch between Light and Dark themes instantly.</p>
+                    <div class="flex space-x-4">
+                        <button onclick="setTheme('light')" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-green-500 flex items-center justify-center space-x-2 font-medium text-sm transition-all">
+                            <i class="fa-solid fa-sun text-amber-500"></i><span>Light Theme</span>
+                        </button>
+                        <button onclick="setTheme('dark')" class="flex-1 py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-green-500 flex items-center justify-center space-x-2 font-medium text-sm transition-all">
+                            <i class="fa-solid fa-moon text-indigo-400"></i><span>Dark Theme</span>
+                        </button>
+                    </div>
+                </div>
+
+                <hr class="border-slate-200 dark:border-slate-800">
+
+                <!-- Sound Effects Settings -->
+                <div>
+                    <h3 class="text-base font-semibold mb-2">Sound Effects (SFX)</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Enable or disable audio feedback across interactions.</p>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="soundToggleCheckbox" onchange="toggleAudio()" class="sr-only peer" checked>
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">Enable Interactive SFX</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-slate-200 dark:border-slate-800 mt-12 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 rounded-lg bg-green-500 flex items-center justify-center text-white text-xs">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span class="font-semibold text-slate-700 dark:text-slate-200">CHILL-HUB</span>
+            </div>
+            <p>&copy; 2026 CHILL-HUB. All rights reserved.</p>
+            <div class="flex space-x-4">
+                <a href="#" onclick="showToast('CHILL-HUB v2.4 Active', 'success')" class="hover:text-green-500 transition-colors">Privacy</a>
+                <a href="#" onclick="showToast('Support is ready!', 'success')" class="hover:text-green-500 transition-colors">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- State & Sound Management ---
+        let soundEnabled = true;
+        let synth = null;
+
+        // Initialize Tone.js synth on first interaction
+        function initSynth() {
+            if (!synth) {
+                try {
+                    synth = new Tone.Synth().toDestination();
+                } catch (e) {
+                    console.log("Audio Context not started yet");
+                }
+            }
+        }
+
+        function playSound(type = 'click') {
+            if (!soundEnabled) return;
+            initSynth();
+            try {
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                if (synth) {
+                    if (type === 'click') {
+                        synth.triggerAttackRelease("C5", "32n");
+                    } else if (type === 'success') {
+                        synth.triggerAttackRelease("G5", "16n");
+                    } else if (type === 'game') {
+                        synth.triggerAttackRelease("E4", "16n");
+                    }
+                }
+            } catch (e) {
+                // Audio safely ignored if restricted
+            }
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggleBtn');
+            const icon = document.getElementById('soundIcon');
+            const checkbox = document.getElementById('soundToggleCheckbox');
+            if (checkbox) checkbox.checked = soundEnabled;
+            if (soundEnabled) {
+                icon.className = "fa-solid fa-volume-high";
+                showToast("Sound effects enabled", "success");
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+                showToast("Sound effects muted", "success");
+            }
+        }
+
+        // --- Toast Notification ---
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            
+            toastMessage.textContent = message;
+            if (type === 'success') {
+                toastIcon.className = "fa-solid fa-circle-check text-green-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-amber-400";
+            }
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- Theme & Dark Mode ---
+        function toggleDarkMode() {
+            playSound('click');
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        }
+
+        function setTheme(theme) {
+            playSound('click');
+            const html = document.documentElement;
+            if (theme === 'dark') {
+                html.classList.add('dark');
+                localStorage.setItem('chill_hub_theme', 'dark');
+                showToast("Dark theme activated");
+            } else {
+                html.classList.remove('dark');
+                localStorage.setItem('chill_hub_theme', 'light');
+                showToast("Light theme activated");
+            }
+        }
+
+        // --- Custom Background Wallpaper ---
+        function applyBackground() {
+            playSound('click');
+            const url = document.getElementById('bgInput').value.trim();
+            if (url) {
+                document.getElementById('mainBody').style.backgroundImage = `url('${url}')`;
+                document.getElementById('bgOverlay').className = "absolute inset-0 bg-slate-900/80 pointer-events-none -z-10 transition-colors duration-300";
+                localStorage.setItem('chill_hub_bg', url);
+                showToast("Custom background applied successfully!");
+            } else {
+                showToast("Please enter a valid image URL", "error");
+            }
+        }
+
+        function clearBackground() {
+            playSound('click');
+            document.getElementById('mainBody').style.backgroundImage = 'none';
+            document.getElementById('bgOverlay').className = "absolute inset-0 bg-slate-50/90 dark:bg-slate-950/90 pointer-events-none -z-10 transition-colors duration-300";
+            document.getElementById('bgInput').value = '';
+            localStorage.removeItem('chill_hub_bg');
+            showToast("Background reset to default");
+        }
+
+        // --- Navigation Tabs ---
+        function switchTab(tabId) {
+            playSound('click');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Update nav styles
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                if(btn.getAttribute('data-tab') === tabId) {
+                    btn.className = "nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/50";
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            playSound('click');
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- Carousel Data & Logic ---
+        const carouselSlides = [
+            {
+                title: "Welcome to CHILL-HUB",
+                subtitle: "Your centralized interactive space for games, library guides, and customization.",
+                image: "https://placehold.co/1200x500/16a34a/ffffff?text=CHILL-HUB+Welcome",
+                badge: "Featured Hub"
+            },
+            {
+                title: "Explore the Arcade",
+                subtitle: "Jump into classic casual games and test your reflexes instantly.",
+                image: "https://placehold.co/1200x500/15803d/ffffff?text=CHILL-HUB+Arcade",
+                badge: "Mini-Games"
+            },
+            {
+                title: "Personalized Experience",
+                subtitle: "Switch between dark/light modes, set custom wallpapers, and toggle sound effects.",
+                image: "https://placehold.co/1200x500/14532d/ffffff?text=CHILL-HUB+Customization",
+                badge: "Custom Themes"
+            }
+        ];
+
+        let currentSlideIndex = 0;
+
+        function renderCarousel() {
+            const container = document.getElementById('carouselContainer');
+            const dotsContainer = document.getElementById('carouselDots');
+            
+            let html = '';
+            let dotsHtml = '';
+
+            carouselSlides.forEach((slide, idx) => {
+                const activeClass = idx === currentSlideIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none';
+                html += `
+                    <div class="absolute inset-0 transition-opacity duration-700 ease-in-out ${activeClass}">
+                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/1200x500/16a34a/ffffff?text=CHILL-HUB+Slide'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent flex flex-col justify-end p-8 sm:p-12">
+                            <span class="inline-block px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30 text-green-300 text-xs font-semibold w-max mb-3">${slide.badge}</span>
+                            <h2 class="text-2xl sm:text-4xl font-extrabold text-white mb-2">${slide.title}</h2>
+                            <p class="text-sm sm:text-base text-slate-300 max-w-2xl">${slide.subtitle}</p>
+                        </div>
+                    </div>
+                `;
+
+                dotsHtml += `
+                    <button onclick="goToSlide(${idx})" class="w-3 h-3 rounded-full transition-all ${idx === currentSlideIndex ? 'bg-green-500 w-8' : 'bg-white/50 hover:bg-white'}"></button>
+                `;
+            });
+
+            container.innerHTML = html;
+            dotsContainer.innerHTML = dotsHtml;
+        }
+
+        function nextSlide() {
+            playSound('click');
+            currentSlideIndex = (currentSlideIndex + 1) % carouselSlides.length;
+            renderCarousel();
+        }
+
+        function prevSlide() {
+            playSound('click');
+            currentSlideIndex = (currentSlideIndex - 1 + carouselSlides.length) % carouselSlides.length;
+            renderCarousel();
+        }
+
+        function goToSlide(idx) {
+            playSound('click');
+            currentSlideIndex = idx;
+            renderCarousel();
+        }
+
+        // Auto slide timer
+        setInterval(() => {
+            currentSlideIndex = (currentSlideIndex + 1) % carouselSlides.length;
+            renderCarousel();
+        }, 6000);
+
+        // --- Library Data & Filtering ---
+        const libraryItems = [
+            { title: "Getting Started with CHILL-HUB", category: "Guide", desc: "Learn how to make the most of your CHILL-HUB workspace and customize your environment.", icon: "fa-compass" },
+            { title: "Interactive Audio with Tone.js", category: "Technology", desc: "An overview of how browser synthesizer audio feedback is generated safely.", icon: "fa-music" },
+            { title: "Design Principles for Web Apps", category: "Design", desc: "Exploring clean layouts, glassmorphism panels, and Tailwind CSS responsiveness.", icon: "fa-wand-magic-sparkles" },
+            { title: "Arcade Gaming Strategies", category: "Gaming", desc: "Tips and tricks for topping your high scores in CHILL-HUB arcade games.", icon: "fa-trophy" },
+            { title: "Productivity & Focus Hacks", category: "Lifestyle", desc: "Maintain optimal focus while taking breaks with casual games and music.", icon: "fa-brain" },
+            { title: "Customization Masterclass", category: "Customization", desc: "How to find and apply stunning wallpapers to make CHILL-HUB uniquely yours.", icon: "fa-palette" }
+        ];
+
+        function renderLibrary(items = libraryItems) {
+            const grid = document.getElementById('libraryGrid');
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">No matching library articles found.</div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => `
+                <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-green-500/50 transition-all group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-10 h-10 rounded-xl bg-green-500/10 text-green-500 flex items-center justify-center">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-500">${item.category}</span>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 group-hover:text-green-500 transition-colors">${item.title}</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">${item.desc}</p>
+                    </div>
+                    <button onclick="showToast('Opened: ${item.title}', 'success')" class="text-sm font-medium text-green-600 dark:text-green-400 flex items-center space-x-1 hover:underline">
+                        <span>Read article</span><i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function filterLibrary() {
+            const query = document.getElementById('librarySearch').value.toLowerCase();
+            const filtered = libraryItems.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.desc.toLowerCase().includes(query) ||
+                item.category.toLowerCase().includes(query)
+            );
+            renderLibrary(filtered);
+        }
+
+        // --- Game Launcher & Arcade ---
+        function launchGame(gameKey) {
+            playSound('game');
+            document.getElementById('gameSelector').classList.add('hidden');
+            const arena = document.getElementById('gameArena');
+            arena.classList.remove('hidden');
+            const titleEl = document.getElementById('activeGameTitle');
+            const container = document.getElementById('gameContainer');
+
+            if (gameKey === 'clicker') {
+                titleEl.textContent = "Energy Clicker Arcade";
+                container.innerHTML = `
+                    <div class="text-center space-y-6 py-8">
+                        <div class="text-6xl font-extrabold text-green-500" id="clickScore">0</div>
+                        <p class="text-sm text-slate-400">Total Energy Units Generated</p>
+                        <button onclick="incrementClicker()" class="w-32 h-32 rounded-full bg-gradient-to-tr from-green-500 to-emerald-400 text-white text-2xl font-bold shadow-xl shadow-green-500/30 hover:scale-105 active:scale-95 transition-transform flex items-center justify-center mx-auto">
+                            <i class="fa-solid fa-bolt"></i>
+                        </button>
+                    </div>
+                `;
+            } else if (gameKey === 'memory') {
+                titleEl.textContent = "Memory Match Game";
+                initMemoryGame(container);
+            }
+        }
+
+        let clickerScore = 0;
+        function incrementClicker() {
+            playSound('click');
+            clickerScore++;
+            const scoreEl = document.getElementById('clickScore');
+            if (scoreEl) scoreEl.textContent = clickerScore;
+        }
+
+        function closeGame() {
+            playSound('click');
+            document.getElementById('gameArena').classList.add('hidden');
+            document.getElementById('gameSelector').classList.remove('hidden');
+        }
+
+        // Memory Match Mini-Game Logic
+        function initMemoryGame(container) {
+            const emojis = ['🚀', '⚡', '🌟', '🎮', '💡', '🔥'];
+            let cards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+            let flipped = [];
+            let matched = [];
+
+            container.innerHTML = `
+                <div class="grid grid-cols-4 gap-3 max-w-md mx-auto py-4">
+                    ${cards.map((emoji, idx) => `
+                        <button onclick="flipCard(this, ${idx}, '${emoji}')" class="memory-card h-20 rounded-xl bg-slate-200 dark:bg-slate-800 text-2xl flex items-center justify-center transition-all hover:bg-slate-300 dark:hover:bg-slate-700" data-index="${idx}" data-emoji="${emoji}">
+                            <span class="opacity-0">?</span>
+                        </button>
+                    `).join('')}
+                </div>
+                <div id="memoryStatus" class="text-sm font-medium text-slate-500 mt-4">Match all pairs to win!</div>
+            `;
+            window.memoryState = { cards, flipped, matched };
+        }
+
+        window.flipCard = function(btn, idx, emoji) {
+            playSound('click');
+            const state = window.memoryState;
+            if (state.flipped.length >= 2 || state.flipped.includes(idx) || state.matched.includes(idx)) return;
+
+            btn.querySelector('span').textContent = emoji;
+            btn.querySelector('span').classList.remove('opacity-0');
+            btn.classList.add('bg-green-500/20', 'border', 'border-green-500');
+            state.flipped.push({ idx, emoji });
+
+            if (state.flipped.length === 2) {
+                if (state.flipped[0].emoji === state.flipped[1].emoji) {
+                    playSound('success');
+                    state.matched.push(state.flipped[0].idx, state.flipped[1].idx);
+                    state.flipped = [];
+                    if (state.matched.length === state.cards.length) {
+                        document.getElementById('memoryStatus').textContent = "🎉 Congratulations! You won the Memory Game!";
+                        showToast("Memory Game Completed!", "success");
+                    }
+                } else {
+                    setTimeout(() => {
+                        state.flipped.forEach(f => {
+                            const cardBtn = document.querySelector(`[data-index="${f.idx}"]`);
+                            if (cardBtn) {
+                                cardBtn.querySelector('span').classList.add('opacity-0');
+                                cardBtn.classList.remove('bg-green-500/20', 'border', 'border-green-500');
+                            }
+                        });
+                        state.flipped = [];
+                    }, 800);
+                }
+            }
+        };
+
+        // --- Initialization on Load ---
+        window.onload = function() {
+            // Restore theme
+            const savedTheme = localStorage.getItem('chill_hub_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Restore custom background
+            const savedBg = localStorage.getItem('chill_hub_bg');
+            if (savedBg) {
+                document.getElementById('bgInput').value = savedBg;
+                document.getElementById('mainBody').style.backgroundImage = `url('${savedBg}')`;
+                document.getElementById('bgOverlay').className = "absolute inset-0 bg-slate-900/80 pointer-events-none -z-10 transition-colors duration-300";
+            }
+
+            renderCarousel();
+            renderLibrary();
+        };
+    </script>
+</body>
+</html>
