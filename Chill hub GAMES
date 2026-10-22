@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chill-Hub</title>
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation Bar */
+    header {
+      background-color: #1e293b;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Logo Container */
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* CH Initials Logo Badge */
+    .logo-badge {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+      letter-spacing: 1px;
+    }
+
+    /* Site Title */
+    .site-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 0.5px;
+    }
+
+    /* Navigation Links */
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: #38bdf8;
+    }
+
+    /* Main Hero Section */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .hero-card {
+      background-color: #1e293b;
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      border: 1px solid #334155;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-card h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #38bdf8;
+    }
+
+    .hero-card p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #38bdf8;
+      color: #0f172a;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .btn:hover {
+      background-color: #7dd3fc;
+      transform: translateY(-2px);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: #1e293b;
+      color: #64748b;
+      font-size: 0.9rem;
+      border-top: 1px solid #334155;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-badge">CH</div>
+      <span class="site-title">Chill-Hub</span>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Content Area -->
+  <main>
+    <div class="hero-card">
+      <h1>Welcome to Chill-Hub</h1>
+      <p>Your space to kick back, relax, and explore. Edit this file to add whatever content, games, or links you want!</p>
+      <a href="#explore" class="btn">Get Started</a>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    &copy; 2026 Chill-Hub. All rights reserved.
+  </footer>
+
+</body>
+</html>
